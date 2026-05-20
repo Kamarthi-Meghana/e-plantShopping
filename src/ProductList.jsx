@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import './ProductList.css';
 import CartItem from './CartItem';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItem } from './CartSlice';
 
 function ProductList({ onHomeClick }) {
 
   const dispatch = useDispatch();
+
+  const CartItems = useSelector((state) => state.cart.items);
 
   const [showCart, setShowCart] = useState(false);
 
@@ -22,7 +24,7 @@ function ProductList({ onHomeClick }) {
             "https://cdn.pixabay.com/photo/2021/01/22/06/04/snake-plant-5939187_1280.jpg",
           description:
             "Produces oxygen at night, improving air quality.",
-          cost: 15
+          cost: "$15"
         },
         {
           name: "Spider Plant",
@@ -30,7 +32,7 @@ function ProductList({ onHomeClick }) {
             "https://cdn.pixabay.com/photo/2018/07/11/06/47/chlorophytum-3530413_1280.jpg",
           description:
             "Filters formaldehyde and xylene from the air.",
-          cost: 12
+          cost: "$12"
         }
       ]
     },
@@ -44,11 +46,21 @@ function ProductList({ onHomeClick }) {
             "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba?q=80&w=1074&auto=format&fit=crop",
           description:
             "Calming scent, used in aromatherapy.",
-          cost: 20
+          cost: "$20"
         }
       ]
     }
   ];
+
+  const calculateTotalQuantity = () => {
+
+    return CartItems
+      ? CartItems.reduce(
+          (total, item) => total + item.quantity,
+          0
+        )
+      : 0;
+  };
 
   const handleAddToCart = (product) => {
 
@@ -78,7 +90,7 @@ function ProductList({ onHomeClick }) {
         <div className="product-grid">
 
           <button onClick={handleCartClick}>
-            Cart
+            Cart ({calculateTotalQuantity()})
           </button>
 
           {plantsArray.map((category, index) => (
@@ -91,7 +103,10 @@ function ProductList({ onHomeClick }) {
 
                 {category.plants.map((plant, plantIndex) => (
 
-                  <div className="product-card" key={plantIndex}>
+                  <div
+                    className="product-card"
+                    key={plantIndex}
+                  >
 
                     <img
                       className="product-image"
@@ -108,12 +123,14 @@ function ProductList({ onHomeClick }) {
                     </div>
 
                     <div className="product-cost">
-                      ${plant.cost}
+                      {plant.cost}
                     </div>
 
                     <button
                       className="product-button"
-                      onClick={() => handleAddToCart(plant)}
+                      onClick={() =>
+                        handleAddToCart(plant)
+                      }
                       disabled={addedToCart[plant.name]}
                     >
                       {addedToCart[plant.name]
@@ -136,7 +153,9 @@ function ProductList({ onHomeClick }) {
       ) : (
 
         <CartItem
-          onContinueShopping={handleContinueShopping}
+          onContinueShopping={
+            handleContinueShopping
+          }
         />
 
       )}
